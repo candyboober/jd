@@ -2,4 +2,9 @@
 .idea/
 
 # compiled go files
-pkg
+pkg/
+env.sh
+
+Gopkg.lock
+Gopkg.toml
+vendor/
