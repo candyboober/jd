@@ -1,5 +1,5 @@
 # IDE
-.idea
+.idea/
 
 # compiled go files
 pkg
