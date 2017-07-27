@@ -6,11 +6,18 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
+// database connection
 type DB struct {
 	Connect *gorm.DB
 	LogMode bool
 }
 
+// global objects
+
+// database cursor
+var Database DB
+
+// initialize database
 func (this *DB) Init(settings string) {
 	var err error
 	this.Connect, err = gorm.Open("postgres", settings)
@@ -22,31 +29,32 @@ func (this *DB) Init(settings string) {
 	this.Connect.LogMode(this.LogMode)
 }
 
-type JDTable struct{
+// base model
+type JDTable struct {
+	gorm.Model
 	DB DB
 }
 
+// create table if not exists
 func (this *JDTable) CreateTable(db gorm.DB) {
 	if !db.HasTable(this) {
 		db.CreateTable(this)
 	}
 }
 
-func (this *JDTable) Get(id int, instance interface{}) interface {}{
-	this.DB.Connect.Where("id = ?", id).First(&instance)
-	return instance
+// CRUD methods
+func (this *JDTable) Get(id string) {
+	//this.DB.Connect.Where("id = ?", id).First(this)
+	Database.Connect.Where("id = ?", id).First(this)
 }
 
+// models
 type Vacancy struct {
-	gorm.Model
 	JDTable
 
 	Title string
 	Body  string `gorm:"size:3000"`
 }
-
-
-var Database DB
 
 func init() {
 	databaseSetting := "user=candy dbname=jd password=1"

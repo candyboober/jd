@@ -1,9 +1,9 @@
 package models
 
 import (
+	"encoding/json"
 	"strconv"
 	"testing"
-	"encoding/json"
 )
 
 func TestVacancy(t *testing.T) {
@@ -49,7 +49,7 @@ func TestVacancy(t *testing.T) {
 		t.Error("Collection of Vacansy is empty")
 	}
 
-	 //test delete obj
+	//test delete obj
 	db.Connect.Delete(&v)
 
 	newV := Vacancy{}
