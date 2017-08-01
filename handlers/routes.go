@@ -1,4 +1,4 @@
-package api
+package handlers
 
 import (
 	"net/http"
@@ -31,13 +31,19 @@ var routes = []Route{
 		"GetVacancyList",
 		"GET",
 		"/",
-		GetVacancyList,
+		ListVacancy,
 	},
 	Route{
 		"GetVacancy",
 		"GET",
 		"/{id}",
-		GetVacancy,
+		RetrieveVacancy,
+	},
+	Route{
+		"CreateVacancy",
+		"POST",
+		"/",
+		CreateVacancy,
 	},
 }
 

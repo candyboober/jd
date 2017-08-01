@@ -44,8 +44,7 @@ func (this *JDTable) CreateTable(db gorm.DB) {
 
 // CRUD methods
 func (this *JDTable) Get(id string) {
-	//this.DB.Connect.Where("id = ?", id).First(this)
-	Database.Connect.Where("id = ?", id).First(this)
+	Database.Connect.Where("id = ?", id).First(&this)
 }
 
 // models

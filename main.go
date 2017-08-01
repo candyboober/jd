@@ -4,10 +4,10 @@ import (
 	"log"
 	"net/http"
 
-	"jd/api"
+	"jd/handlers"
 )
 
 func main() {
-	router := api.RootRoute
+	router := handlers.RootRoute
 	log.Fatal(http.ListenAndServe(":8000", router))
 }
