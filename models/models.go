@@ -57,7 +57,7 @@ type Vacancy struct {
 }
 
 func init() {
-	databaseSetting := "user=candy dbname=jd password=1"
+	databaseSetting := "user=candy dbname=jd password=1 sslmode=disable"
 	db, err := gorm.Open("postgres", databaseSetting)
 	defer db.Close()
 

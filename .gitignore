@@ -1,10 +1,7 @@
 # IDE
 .idea/
 
-# compiled go files
-pkg/
-env.sh
-
+# dependency
 Gopkg.lock
 Gopkg.toml
 vendor/
