@@ -13,7 +13,7 @@ type Route struct {
 	HandlerFunc http.HandlerFunc
 }
 
-func NewRouter(routes []Route) *mux.Router {
+func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 	for _, route := range routes {
 		router.
@@ -46,5 +46,3 @@ var routes = []Route{
 		CreateVacancy,
 	},
 }
-
-var RootRoute *mux.Router = NewRouter(routes)

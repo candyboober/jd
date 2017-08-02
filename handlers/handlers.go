@@ -6,6 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"fmt"
 	"io"
 	"io/ioutil"
 	"jd/models"
@@ -68,6 +69,11 @@ func CreateVacancy(w http.ResponseWriter, r *http.Request) {
 	}
 
 	models.Database.Connect.Create(&vacancy)
+	if models.Database.Connect.NewRecord(vacancy) {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, body)
+	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(vacancy); err != nil {
