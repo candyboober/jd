@@ -6,10 +6,10 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"jd/models"
-	"io/ioutil"
 	"io"
-	"fmt"
+	"io/ioutil"
+	"jd/models"
+	"strconv"
 )
 
 func ListVacancy(w http.ResponseWriter, r *http.Request) {
@@ -18,17 +18,30 @@ func ListVacancy(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	err := json.NewEncoder(w).Encode(vacansies)
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(vacansies); err != nil {
 		panic(err)
 	}
 }
 
 func RetrieveVacancy(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	vacancy := models.Vacancy{}
-	vacancy.Get(id)
-	fmt.Println(vacancy)
+	i, err := strconv.Atoi(id)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(422)
+		if err := json.NewEncoder(w).Encode(err); err != nil {
+			panic(err)
+		}
+		return
+	}
+
+	vacancy := &models.Vacancy{}
+	models.Database.Get(vacancy, i)
+
+	if vacancy.ID == 0 {
+		http.NotFound(w, r)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
@@ -47,7 +60,6 @@ func CreateVacancy(w http.ResponseWriter, r *http.Request) {
 	}
 	vacancy := models.Vacancy{}
 	if err := json.Unmarshal(body, &vacancy); err != nil {
-		fmt.Println(body)
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(422)
 		if err := json.NewEncoder(w).Encode(err); err != nil {

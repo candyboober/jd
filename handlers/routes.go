@@ -36,7 +36,7 @@ var routes = []Route{
 	Route{
 		"GetVacancy",
 		"GET",
-		"/{id}",
+		"/{id:[0-9]+}",
 		RetrieveVacancy,
 	},
 	Route{
