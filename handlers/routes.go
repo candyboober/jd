@@ -45,4 +45,16 @@ var routes = []Route{
 		"/",
 		CreateVacancy,
 	},
+	Route{
+		"UpdateVacancy",
+		"PATCH",
+		"/{id:[0-9]+}",
+		UpdateVacancy,
+	},
+	Route{
+		"DestroyVacancy",
+		"DELETE",
+		"/{id:[0-9]+}",
+		DestroyVacancy,
+	},
 }

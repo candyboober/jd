@@ -73,9 +73,68 @@ func CreateVacancy(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, body)
+		return
 	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(vacancy); err != nil {
+		panic(err)
+	}
+}
+
+func UpdateVacancy(w http.ResponseWriter, r *http.Request)  {
+	id := mux.Vars(r)["id"]
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(422)
+		if err := json.NewEncoder(w).Encode(err); err != nil {
+			panic(err)
+		}
+		return
+	}
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	if err != nil {
+		panic(err)
+	}
+	if err := r.Body.Close(); err != nil {
+		panic(err)
+	}
+	vacancy := models.Vacancy{ID: uint(idInt)}
+
+	if err := json.Unmarshal(body, &vacancy); err != nil {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(422)
+		if err := json.NewEncoder(w).Encode(err); err != nil {
+			panic(err)
+		}
+	}
+
+	models.Database.Connect.Save(&vacancy)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(vacancy); err != nil {
+		panic(err)
+	}
+}
+
+func DestroyVacancy(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(422)
+		if err := json.NewEncoder(w).Encode(err); err != nil {
+			panic(err)
+		}
+		return
+	}
+
+	vacancy := &models.Vacancy{ID: uint(idInt)}
+	models.Database.Connect.Delete(vacancy)
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(vacancy); err != nil {
 		panic(err)
 	}
