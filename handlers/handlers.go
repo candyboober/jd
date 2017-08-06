@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/auth0/go-jwt-middleware"
 
 	"fmt"
 	"io"
@@ -12,6 +14,31 @@ import (
 	"jd/models"
 	"strconv"
 )
+
+var secret = []byte("secret")
+
+func GetTokenJWT(w http.ResponseWriter, r *http.Request) {
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	//claims := token.Claims.(jwt.MapClaims)
+	//claims["admin"] = true
+	//claims["name"] = "My name"
+	//claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+
+	tokenString, err := token.SignedString(secret)
+	if err != nil {
+		panic(err)
+	}
+
+	w.Write([]byte(tokenString))
+}
+
+var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
+	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
+		return secret, nil
+	},
+	SigningMethod: jwt.SigningMethodHS256,
+})
 
 func ListVacancy(w http.ResponseWriter, r *http.Request) {
 	var vacansies []models.Vacancy

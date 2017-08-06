@@ -43,6 +43,8 @@ type Vacancy struct {
 }
 
 
+
+
 func init() {
 	databaseSetting := "user=candy dbname=jd password=1 sslmode=disable"
 	Database.Init(databaseSetting)

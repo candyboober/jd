@@ -28,6 +28,12 @@ func NewRouter() *mux.Router {
 
 var routes = []Route{
 	Route{
+		"GetToken",
+		"GET",
+		"/get-token",
+		GetTokenJWT,
+	},
+	Route{
 		"GetVacancyList",
 		"GET",
 		"/",
