@@ -12,9 +12,6 @@ func TestVacancy(t *testing.T) {
 	db.Init("user=candy dbname=jd_test password=1")
 	v := Vacancy{}
 
-	// test create table
-	v.CreateTable(*db.Connect)
-
 	// test create obj
 	data := map[string]string{"title": "Some title", "body": "So long text body"}
 	v = Vacancy{Title: data["title"], Body: data["body"]}

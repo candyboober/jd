@@ -2,43 +2,69 @@ package handlers
 
 import (
 	"encoding/json"
-	"net/http"
-
-	"github.com/gorilla/mux"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/auth0/go-jwt-middleware"
-
 	"fmt"
+	"github.com/auth0-community/auth0"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/mux"
+	jose "gopkg.in/square/go-jose.v2"
 	"io"
 	"io/ioutil"
 	"jd/models"
+	"net/http"
 	"strconv"
+	"time"
 )
 
 var secret = []byte("secret")
 
-func GetTokenJWT(w http.ResponseWriter, r *http.Request) {
+var GetTokenHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	/* Create the token */
 	token := jwt.New(jwt.SigningMethodHS256)
+	fmt.Println("token - ", token)
 
-	//claims := token.Claims.(jwt.MapClaims)
-	//claims["admin"] = true
-	//claims["name"] = "My name"
-	//claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+	/* Create a map to store our claims */
+	claims := token.Claims.(jwt.MapClaims)
 
+	/* Set token claims */
+	claims["admin"] = true
+	claims["name"] = "Ado Kukic"
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+
+	/* Sign the token with our secret */
 	tokenString, err := token.SignedString(secret)
 	if err != nil {
 		panic(err)
 	}
 
+	/* Finally, write the token to the browser window */
 	w.Write([]byte(tokenString))
-}
-
-var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
-	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-		return secret, nil
-	},
-	SigningMethod: jwt.SigningMethodHS256,
 })
+
+func authMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		secret := []byte("{YOUR-API-CLIENT-SECRET}")
+		secretProvider := auth0.NewKeyProvider(secret)
+		audience := []string{"{YOUR-AUTH0-API-AUDIENCE}"}
+
+		configuration := auth0.NewConfiguration(
+			secretProvider,
+			audience,
+			"https://{YOUR-AUTH0-DOMAIN}.auth0.com/",
+			jose.HS256)
+		validator := auth0.NewValidator(configuration)
+
+		token, err := validator.ValidateRequest(r)
+
+		if err != nil {
+			fmt.Println(err)
+			fmt.Println("Token is not valid:", token)
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("Unauthorized"))
+		} else {
+			next.ServeHTTP(w, r)
+		}
+	})
+}
 
 func ListVacancy(w http.ResponseWriter, r *http.Request) {
 	var vacansies []models.Vacancy
@@ -109,7 +135,7 @@ func CreateVacancy(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateVacancy(w http.ResponseWriter, r *http.Request)  {
+func UpdateVacancy(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
