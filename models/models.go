@@ -42,7 +42,6 @@ type Vacancy struct {
 	Body  string `json: "body" gorm:"size:3000"`
 }
 
-
 func init() {
 	databaseSetting := "user=candy dbname=jd password=1 sslmode=disable"
 	Database.Init(databaseSetting)
