@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/dgrijalva/jwt-go"
 	"time"
+	"fmt"
 )
 
 var secret = []byte("secret")
@@ -21,6 +22,7 @@ var SignIn = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	// if you read from body, error is not irrelevant
 	if err := r.Body.Close(); err != nil {
 		panic(err)
 	}
@@ -90,31 +92,28 @@ var SignUp = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	}
 })
 
-//func authMiddleware(next http.Handler) http.Handler {
-//	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//		secret := []byte("{YOUR-API-CLIENT-SECRET}")
-//		secretProvider := auth0.NewKeyProvider(secret)
-//		audience := []string{"{YOUR-AUTH0-API-AUDIENCE}"}
-//
-//		configuration := auth0.NewConfiguration(
-//			secretProvider,
-//			audience,
-//			"https://{YOUR-AUTH0-DOMAIN}.auth0.com/",
-//			jose.HS256)
-//		validator := auth0.NewValidator(configuration)
-//
-//		token, err := validator.ValidateRequest(r)
-//
-//		if err != nil {
-//			fmt.Println(err)
-//			fmt.Println("Token is not valid:", token)
-//			w.WriteHeader(http.StatusUnauthorized)
-//			w.Write([]byte("Unauthorized"))
-//		} else {
-//			next.ServeHTTP(w, r)
-//		}
-//	})
-//}
+func authMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		tokenString := r.Header.Get("Authorization")
+
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			// Don't forget to validate the alg is what you expect:
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			}
+			return secret, nil
+		})
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			next.ServeHTTP(w, r)
+		} else {
+			w.WriteHeader(http.StatusUnauthorized)
+		}
+	})
+}
 
 func ListVacancy(w http.ResponseWriter, r *http.Request) {
 	var vacansies []models.Vacancy
