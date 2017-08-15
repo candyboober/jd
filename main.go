@@ -1,13 +1,15 @@
 package main
 
 import (
-	"log"
 	"net/http"
 
-	"jd/handlers"
+	"github.com/gorilla/handlers"
+	. "jd/handlers"
+	"os"
 )
 
 func main() {
-	route := handlers.NewRouter()
-	log.Fatal(http.ListenAndServe(":8000", route))
+	route := NewRouter()
+	//log.Fatal(http.ListenAndServe(":8000", route))
+	http.ListenAndServe(":8000", handlers.LoggingHandler(os.Stdout, route))
 }

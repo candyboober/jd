@@ -15,18 +15,34 @@ type Route struct {
 
 func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
-	for _, route := range routes {
+	for _, route := range apiRoutes {
+		router.
+			Methods(route.Method).
+			Path(route.Pattern).
+			Name(route.Name).
+			Handler(authMiddleware(route.HandlerFunc))
+
+	}
+	for _, route := range authRoutes {
 		router.
 			Methods(route.Method).
 			Path(route.Pattern).
 			Name(route.Name).
 			Handler(route.HandlerFunc)
-
 	}
 	return router
 }
 
-var routes = []Route{
+var authRoutes = []Route{
+	Route{
+		"GetTokenHandler",
+		"GET",
+		"/get-token",
+		GetTokenHandler,
+	},
+}
+
+var apiRoutes = []Route{
 	Route{
 		"GetVacancyList",
 		"GET",
@@ -44,5 +60,17 @@ var routes = []Route{
 		"POST",
 		"/",
 		CreateVacancy,
+	},
+	Route{
+		"UpdateVacancy",
+		"PATCH",
+		"/{id:[0-9]+}",
+		UpdateVacancy,
+	},
+	Route{
+		"DestroyVacancy",
+		"DELETE",
+		"/{id:[0-9]+}",
+		DestroyVacancy,
 	},
 }
