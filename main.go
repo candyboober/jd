@@ -1,15 +1,16 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/gorilla/handlers"
-	. "jd/handlers"
+	"net/http"
 	"os"
+	"jd/routes"
 )
 
+type T struct {
+	A int
+}
+
 func main() {
-	route := NewRouter()
-	//log.Fatal(http.ListenAndServe(":8000", route))
-	http.ListenAndServe(":8000", handlers.LoggingHandler(os.Stdout, route))
+	http.ListenAndServe(":8000", handlers.LoggingHandler(os.Stdout, routes.Router))
 }

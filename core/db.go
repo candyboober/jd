@@ -1,8 +1,9 @@
-package models
+package core
 
 import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"jd/models"
 )
 
 type DB struct {
@@ -29,6 +30,6 @@ func init() {
 	databaseSetting := "user=candy dbname=jd password=1 sslmode=disable"
 	Database.Init(databaseSetting)
 
-	Database.Connect.AutoMigrate(&Vacancy{})
-	Database.Connect.AutoMigrate(&User{})
+	Database.Connect.AutoMigrate(&models.Vacancy{})
+	Database.Connect.AutoMigrate(&models.User{})
 }
