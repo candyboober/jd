@@ -20,7 +20,7 @@ func NewRouter() *mux.Router {
 			Methods(route.Method).
 			Path(route.Pattern).
 			Name(route.Name).
-			Handler(authMiddleware(route.HandlerFunc))
+			Handler(route.HandlerFunc)
 
 	}
 	for _, route := range authRoutes {
@@ -35,10 +35,16 @@ func NewRouter() *mux.Router {
 
 var authRoutes = []Route{
 	Route{
-		"GetTokenHandler",
-		"GET",
-		"/get-token",
-		GetTokenHandler,
+		"SignIn",
+		"POST",
+		"/sign-in",
+		SignIn,
+	},
+	Route{
+		"SignUp",
+		"POST",
+		"/sign-up",
+		SignUp,
 	},
 }
 
