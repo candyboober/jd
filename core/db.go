@@ -9,13 +9,12 @@ import (
 type DB struct {
 	Connect *gorm.DB
 	LogMode bool
+	PageSize uint16
 }
-
-var Database DB
-
 // initialize database
 func (this *DB) Init(settings string) {
-	this.LogMode = true
+	this.LogMode = PostgresLogMode
+	this.PageSize = PageSize
 
 	var err error
 	this.Connect, err = gorm.Open("postgres", settings)
@@ -25,6 +24,13 @@ func (this *DB) Init(settings string) {
 	}
 	this.Connect.LogMode(this.LogMode)
 }
+
+func (this *DB) PaginatedQuery(page int) *gorm.DB {
+	offset := int(this.PageSize) * page - int(this.PageSize)
+	return this.Connect.Offset(offset).Limit(int(this.PageSize))
+}
+
+var Database DB
 
 func init() {
 	databaseSetting := "user=candy dbname=jd password=1 sslmode=disable"

@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"io"
 	"io/ioutil"
@@ -13,36 +11,31 @@ import (
 	"strconv"
 )
 
-func authMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tokenString := r.Header.Get("Authorization")
-
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			// Don't forget to validate the alg is what you expect:
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-			}
-			return core.Secret, nil
-		})
-		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			next.ServeHTTP(w, r)
-		} else {
-			w.WriteHeader(http.StatusUnauthorized)
-		}
-	})
+type VacancyResponse struct {
+	Vacancies []models.Vacancy `json:"vacancies"`
+	Count int `json:"count"`
 }
 
 func ListVacancy(w http.ResponseWriter, r *http.Request) {
-	var vacansies []models.Vacancy
-	core.Database.Connect.Find(&vacansies)
+	pageQuery := r.URL.Query().Get("page")
+	var page int
+	var err error
+	if pageQuery == "" {
+		page = 1
+	} else {
+		page, err = strconv.Atoi(pageQuery)
+		if err != nil {
+			page = 1
+		}
+	}
+	vacancies := []models.Vacancy{}
+	count := 0
+	core.Database.PaginatedQuery(page).Find(&vacancies).Count(&count)
 
+	response := &VacancyResponse{vacancies, count}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(vacansies); err != nil {
+	if err := json.NewEncoder(w).Encode(response); err != nil {
 		panic(err)
 	}
 }
