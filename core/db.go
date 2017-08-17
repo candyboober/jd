@@ -38,4 +38,5 @@ func init() {
 
 	Database.Connect.AutoMigrate(&models.Vacancy{})
 	Database.Connect.AutoMigrate(&models.User{})
+	Database.Connect.AutoMigrate(&models.Message{})
 }

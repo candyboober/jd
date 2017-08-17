@@ -2,9 +2,11 @@ package main
 
 import (
 	"github.com/gorilla/handlers"
+	"jd/core"
+	"jd/models"
+	"jd/routes"
 	"net/http"
 	"os"
-	"jd/routes"
 )
 
 type T struct {

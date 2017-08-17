@@ -7,7 +7,7 @@ import (
 var PasswordSalt = []byte("passwordsalt")
 
 type User struct {
-	ID uint `gorm:"primary_key"`
+	ID uint `json:"id" gorm:"primary_key"`
 	Username string `json:"username" gorm:"size:20; not null"`
 	Password []byte `json:"-" gorm:"size:255; not null"`
 }
