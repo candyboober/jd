@@ -4,6 +4,7 @@ import (
 	"jd/core"
 	"jd/handlers"
 	"jd/middlewares"
+	"jd/sockets"
 )
 
 var routes = []core.Route{
@@ -52,6 +53,13 @@ var routes = []core.Route{
 		"DELETE",
 		"/{id:[0-9]+}",
 		handlers.DestroyVacancy,
+	},
+
+	core.Route{
+		"Messages",
+		"GET",
+		"/messages",
+		sockets.MakeWsHandler(),
 	},
 }
 

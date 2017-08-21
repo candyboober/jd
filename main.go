@@ -2,17 +2,15 @@ package main
 
 import (
 	"github.com/gorilla/handlers"
-	"jd/core"
-	"jd/models"
 	"jd/routes"
 	"net/http"
 	"os"
+	"log"
 )
 
-type T struct {
-	A int
-}
-
 func main() {
-	http.ListenAndServe(":8000", handlers.LoggingHandler(os.Stdout, routes.Router))
+	err := http.ListenAndServe(":8080", handlers.LoggingHandler(os.Stdout, routes.Router))
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
 }
