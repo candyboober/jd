@@ -18,8 +18,7 @@ func (this *DB) Init(settings string) {
 	this.LogMode = true
 
 	var err error
-	this.Connect, err = gorm.Open("postgres", settings)
-
+	this.Connect, err = gorm.Open("postgres", "host=postgres port=5432 user=postgres dbname=jd sslmode=disable")
 	if err != nil {
 		panic(err)
 	}
