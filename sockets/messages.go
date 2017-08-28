@@ -139,15 +139,20 @@ func (h *Hub) Run() {
 	}
 }
 
+var hub *Hub
+
 func MakeWsHandler() func(w http.ResponseWriter, r *http.Request){
-	hub := &Hub{
+	return func(w http.ResponseWriter, r *http.Request) {
+		ServeWs(hub, w, r)
+	}
+}
+
+func init(){
+	hub = &Hub{
 		Clients: make(map[*Client]bool),
 		Broadcast: make(chan []byte),
 		Register: make(chan *Client),
 		Unregister: make(chan *Client),
 	}
 	go hub.Run()
-	return func(w http.ResponseWriter, r *http.Request) {
-		ServeWs(hub, w, r)
-	}
 }
